@@ -1,0 +1,59 @@
+print("test")
+
+local testt = {
+	venus = "awesome",
+	"lots of test",1,2,
+	test2 = "hi"
+}
+
+for i = 0,5 do
+	print(i)
+end
+
+for _,el in pairs(testt) do
+	print(el)
+end
+
+foreach i,el in testt do
+	print(i.." = "..el)
+end
+
+--[[ coming soon
+//comment
+
+fn a()
+	print("function")
+end
+
+local i = 0
+local j = 0
+
+i = i + 1
+j = j + 2
+i++
+j += 2
+
+function t() {
+	print("hi")
+}
+
+if (true) {
+	print("weewoo")
+}
+
+for i = 0, 10 {
+	print(i)
+}
+
+function callit(fun,arg)
+	fun(arg)
+end
+
+callit(() => {
+	print("testing")
+})
+
+callit((t) => {
+	print(t)
+}, "more test")
+--]]
