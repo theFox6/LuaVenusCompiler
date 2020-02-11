@@ -26,7 +26,7 @@ end
 for comments --, // and ## can be used
 if something follows a -- it will always be treated as comment
 
-##todo
+## todo
 - curly braces
 - increment, decrement, etc.
 - fn and lambdas
