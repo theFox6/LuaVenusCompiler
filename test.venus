@@ -18,9 +18,15 @@ foreach i,el in testt do
 	print(i.." = "..el)
 end
 
---[[ coming soon
+// comment
+## comment
 //comment
+assert("//"=="/".."/")
+-- comment
+assert([[
+##]]=="#".."#","comment within [[string]] falsely detected")
 
+--[[ coming soon
 fn a()
 	print("function")
 end
@@ -32,6 +38,11 @@ i = i + 1
 j = j + 2
 i++
 j += 2
+
+function dec(n)
+	n--
+	return n -- not a decrement
+end
 
 function t() {
 	print("hi")

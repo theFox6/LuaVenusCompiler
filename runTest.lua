@@ -1,3 +1,3 @@
-local p = dofile("src/init.lua")
+local p = dofile("init.lua")
 
-p.dovenus("src/test.venus")
+p.dovenus("test.venus")
