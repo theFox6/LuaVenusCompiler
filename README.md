@@ -1,6 +1,6 @@
 # venus lua parser
 A parser that loads venus files into lua. Written in lua.  
-The parser reads the lua file replaces venus syntax by lua syntax and loads the result.
+The parser reads the venus file replaces venus syntax by lua syntax and loads the result.
 
 ## features
 ### foreach
