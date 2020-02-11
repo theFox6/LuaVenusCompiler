@@ -47,7 +47,7 @@ local function parse_element(el,pc)
   end
   if el == "foreach" then
     pc.foreach = 1
-    return "for"
+    return "for _,"
   elseif el == "for" then
     pc.foreach = 0
   elseif el == "in" then
@@ -100,13 +100,17 @@ local function parse_line(l,pc)
   return pl
 end
 
-function parser.loadvenus(file)
+function parser.loadvenus(file,env)
   local fc = ""
   local pc = {instring == false, opencurly = {}}
   for l in io.lines(file) do
     fc = fc .. parse_line(l,pc) .. "\n"
   end
-  return loadstring(fc,"@"..file)
+  if env then
+    return loadstring(fc,"@"..file,"t",env)
+  else
+    return loadstring(fc,"@"..file)
+  end
 end
 
 function parser.dovenus(file)
@@ -117,6 +121,7 @@ function parser.dovenus(file)
   return ff()
 end
 
+-- in case anybody wants to use it too
 parser.optmatch = optmatch
 
 return parser
