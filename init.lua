@@ -41,24 +41,7 @@ function parser.test_optmatch()
 end
 
 local function parse_element(el,pc)
-  if pc.foreach == 2 then
-    pc.foreach = 3
-    return "pairs("..el
-  end
-  if el == "foreach" then
-    pc.foreach = 1
-    return "for _,"
-  elseif el == "for" then
-    pc.foreach = 0
-  elseif el == "in" then
-    if pc.foreach == 1 then
-      pc.foreach = 2
-    end
-  elseif el == "do" then
-    if pc.foreach == 3 then
-      return ")" .. el
-    end
-  elseif el == '"' or el == "'" then
+  if el == '"' or el == "'" then
     if not pc.instring then
       pc.instring = el
     elseif pc.instring == el then
@@ -71,6 +54,29 @@ local function parse_element(el,pc)
   elseif el == "]]" then
     if pc.instring == "[[" then
       pc.instring = false
+    end
+  elseif pc.instring then
+    return el
+  end
+
+  if pc.foreach == 2 then
+    pc.foreach = 3
+    return "pairs("..el
+  end
+
+  if el == "foreach" then
+    pc.foreach = 1
+    return "for _,"
+  elseif el == "for" then
+    pc.foreach = 0
+  elseif el == "in" then
+    if pc.foreach == 1 then
+      pc.foreach = 2
+    end
+  elseif el == "do" then
+    if pc.foreach == 3 then
+      pc.foreach = 0
+      return ")" .. el
     end
   elseif el == "//" or el=="##" then
     if not pc.instring then
