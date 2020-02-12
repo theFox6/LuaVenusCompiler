@@ -65,6 +65,28 @@ local function parse_element(el,pc)
     pc.ifend = false
   end
   
+  if el == "=>" then
+    if not pc.lambargs then
+      parser.warn(("invalid lambda in line %i"):format(pc.line))
+      return el
+    end
+    local larg = pc.lambargs
+    pc.lambargs = false
+    pc.lambend = false
+    pc.precurly = "function"
+    pc.curlyopt = true
+    return "function" .. larg .. " "
+  elseif pc.lambend then
+    if prefix then
+      parser.warn("end statement and lambda match end may be mixed")
+      prefix = pc.lambargs .. prefix
+    else
+      prefix = pc.lambargs
+    end
+    pc.lambargs = false
+    pc.lambend = false
+  end
+  
   if el == '"' or el == "'" then
     if not pc.instring then
       pc.instring = el
@@ -80,7 +102,7 @@ local function parse_element(el,pc)
       pc.instring = false
     end
   elseif pc.instring then
-    return el
+    return el,prefix
   end
 
   if pc.foreach == 2 then
@@ -88,36 +110,36 @@ local function parse_element(el,pc)
     if el == "{" then
       table.insert(pc.opencurly, "table")
     end
-    return "pairs("..el
+    return "pairs("..el,prefix
   elseif el == "{" then
     if pc.foreach == 3 then
       pc.foreach = 0
       table.insert(pc.opencurly, "for")
       pc.curlyopt = false
-      return ") do"
+      return ") do",prefix
     elseif not pc.curlyopt then
       if pc.linestart then
         table.insert(pc.opencurly, "do")
-        return "do "
+        return "do ",prefix
       else
         table.insert(pc.opencurly, "table")
-        return el
+        return el,prefix
       end
     elseif pc.curlyopt == true then
       if pc.precurly == "function" or pc.precurly == "repeat" or pc.precurly == "else" then
         table.insert(pc.opencurly, pc.precurly)
         pc.precurly = false
         pc.curlyopt = false
-        return ""
+        return "",prefix
       end
     elseif pc.curlyopt == "for" or pc.curlyopt == "while" then
       table.insert(pc.opencurly, pc.curlyopt)
       pc.curlyopt = false
-      return " do"
+      return " do",prefix
     elseif pc.curlyopt == "if" then
       table.insert(pc.opencurly, pc.curlyopt)
       pc.curlyopt = false
-      return " then"
+      return " then",prefix
     end
   elseif pc.precurly then
     pc.precurly = false
@@ -127,24 +149,24 @@ local function parse_element(el,pc)
   if el == "}" then
     local closecurly = table.remove(pc.opencurly)
     if closecurly == "table" then
-      return el
+      return el,prefix
     elseif closecurly == "repeat" then
-      return "" -- until will follow
+      return "",prefix
     elseif closecurly == "for" or closecurly == "while" or
         closecurly == "function" or closecurly == "repeat" or
         closecurly == "do" or closecurly == "else" then
-      return "end"
+      return "end",prefix
     elseif closecurly == "if" then
       pc.ifend = "end"
-      return ""
+      return "",prefix
     else
       parser.warn(("closing curly bracket in line %i could not be matched to an opening one"):format(pc.line))
-      return el
+      return el,prefix
     end
   elseif el == "foreach" then
     pc.curlyopt = "for"
     pc.foreach = 1
-    return "for _,"
+    return "for _,",prefix
   elseif el == "for" then
     pc.curlyopt = el
     pc.foreach = 0
@@ -156,7 +178,7 @@ local function parse_element(el,pc)
     pc.curlyopt = false
     if pc.foreach == 3 then
       pc.foreach = 0
-      return ") " .. el
+      return ") " .. el,prefix
     end
   elseif el == "while" then
     pc.curlyopt = el
@@ -169,30 +191,24 @@ local function parse_element(el,pc)
     pc.curlyopt = false
   elseif el == "fn" then
     pc.curlyopt = "function"
-    return "function"
+    return "function",prefix
   elseif el == "function" then
     pc.curlyopt = el
   elseif el == "(" then
     pc.newlamb = el
-    return ""
+    pc.lambend = false
+    return "",prefix
   elseif el == ")" then
     if pc.curlyopt == "function" then
       pc.precurly = pc.curlyopt
       pc.curlyopt = true
     end
-  elseif el == "=>" then
-    if not pc.lambargs then
-      parser.warn(("invalid lambda in line %i"):format(pc.line))
-      return el
+    if pc.lambargs then
+      pc.lambend = true
     end
-    local larg = pc.lambargs
-    pc.lambargs = false
-    pc.precurly = "function"
-    pc.curlyopt = true
-    return "function" .. larg .. " "
   elseif el == "//" or el=="##" then
     if not pc.instring then
-      return "--"
+      return "--",prefix
     end
   end
   --print(el,pc.instring and "in string" or "")
@@ -236,6 +252,7 @@ local function parse_line(l,pc)
           elseif el ~= "" then
             el = pc.lambargs .. el
             pc.lambargs = false
+            pc.lambend = false
             --print("notl:", el)
           end
         end

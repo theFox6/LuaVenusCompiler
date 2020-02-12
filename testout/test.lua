@@ -14,13 +14,13 @@ end
 
 assert(a == 15)
 
-for i,el in pairs(testt) do
+for i,el in pairs(testt)  do
 	print(i.." = "..el)
 end
 
 for _, el in pairs(testt ) do
 	print(el)
-end
+ end
 
 -- comment
 -- comment
@@ -31,10 +31,10 @@ assert([[
 ##]]=="#".."#","comment within [[string]] falsely detected")
 
 function a()
-	return "function"
+	 return "function"
 end
 
-assert(a()=="function")
+assert(a() =="function")
 assert([[
 fn]]=="f".."n")
 
@@ -43,37 +43,37 @@ do
 		local a = {...}
 		for _, a in pairs(a ) do
 			print(a)
-		end
+		 end
 	end)("a","still a","also a")
 end
 
 do 
 	local a = 12
 	print(a)
-end
+ end
 a()
 
-function t() 
+ function t() 
 	return "hi"
 end
-assert(t()=="hi")
+assert(t() =="hi")
 
 function t2() 
 	return "also hi"
 end
-assert(t2()=="also hi")
+assert(t2() =="also hi")
 
-if (true)  then
+if (true)   then
 	print("weewoo")
  end
 
 for i = 0, 10  do
 	print(i)
-end
+ end
 
 for _, el in pairs({"lot's of test",2,"3",1} ) do
 	print(el)
-end
+ end
 
 do 
 	local i = 0
@@ -88,8 +88,8 @@ do
 end
 
 function callit(fun,t1,t2)
-	return fun(t1,t2)
-end
+	 return fun(t1,t2)
+ end
 
 assert(
 	callit(function()   
@@ -101,7 +101,14 @@ assert(
 	callit(function(k,v)   
 		return k.." = "..v
 	end, "this test", "more test")
-	== "this test = more test")
+	== "this test = more test"
+)
+	
+assert(
+	callit(function(a , b)   
+		return (a-b)*4
+	end, 10, 6) == 16
+)
 
 print("test end")
 

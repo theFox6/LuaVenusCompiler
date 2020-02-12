@@ -101,7 +101,14 @@ assert(
 	callit((k,v) => {
 		return k.." = "..v
 	}, "this test", "more test")
-	== "this test = more test")
+	== "this test = more test"
+)
+	
+assert(
+	callit((a , b) => {
+		return (a-b)*4
+	}, 10, 6) == 16
+)
 
 print("test end")
 
