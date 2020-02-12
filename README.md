@@ -77,6 +77,30 @@ function test()
 end
 ```
 
+### lambdas
+Lambda syntax `(args) => {...}` can be used to create functions.
+```lua
+local result
+fn store_it(f) {
+	result = f(10,6)
+}
+
+store_it((a,b) => {
+	return (a - b) * 2
+})
+```
+will generate
+```lua
+local result
+function store_it(f)
+	result = f(10,6)
+end
+
+store_it(function(a,b)
+	return (a - b) * 2
+end)
+```
+
 ## working with the parser
 ### loading
 The init.lua returns a table containing the parser.  
@@ -104,7 +128,6 @@ It's argument can be a relative or absolute path to the file that should be tran
 It returns the generated lua as string.
 
 ##todo
-- lambdas
 - increment, decrement, etc.
 - generate lua from a venus string
 - perhaps write generated lua files to disk

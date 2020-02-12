@@ -1,11 +1,12 @@
 local parser = {}
 
 local elements = {
-  names = "(%a%w+)",
+  names = "^(%a%w*)$",
   spaces = "(%s+)",
   special = "[%%%(%)%{%}%;%,]",
   strings = "[\"']",
-  special_combined = "([%+%-%*/%^#=~<>%[%]:%.][%+%-/#=%[%]:%.]?[%.]?)",
+  special_combined = "([%+%-%*/%^#=~<>%[%]:%.][%+%-/#=>%[%]:%.]?[%.]?)",
+  lambda_args = "[,%(%)]"
 }
 
 function parser.warn(msg)
@@ -44,6 +45,7 @@ function parser.test_optmatch()
   assert(optmatch("123","2")() == "1")
 end
 
+--TODO: make some functions handling each group of commands
 local function parse_element(el,pc)
   if el == "" then
     return el
@@ -170,11 +172,24 @@ local function parse_element(el,pc)
     return "function"
   elseif el == "function" then
     pc.curlyopt = el
+  elseif el == "(" then
+    pc.newlamb = el
+    return ""
   elseif el == ")" then
     if pc.curlyopt == "function" then
       pc.precurly = pc.curlyopt
       pc.curlyopt = true
     end
+  elseif el == "=>" then
+    if not pc.lambargs then
+      parser.warn(("invalid lambda in line %i"):format(pc.line))
+      return el
+    end
+    local larg = pc.lambargs
+    pc.lambargs = false
+    pc.precurly = "function"
+    pc.curlyopt = true
+    return "function" .. larg .. " "
   elseif el == "//" or el=="##" then
     if not pc.instring then
       return "--"
@@ -184,25 +199,47 @@ local function parse_element(el,pc)
   return el, prefix
 end
 
+--TODO: make functions handling the lambdas
 local function parse_line(l,pc)
   local pl = ""
   local i = 0
   for sp,s in optmatch(l,elements.spaces) do
     if s then
-      pl = pl .. sp
+      if pc.lambargs then
+        pc.lambargs = pc.lambargs .. sp
+      else
+        pl = pl .. sp
+      end
     else
       for sc in optmatch(sp,elements.special_combined) do
       for ss in optmatch(sc,elements.special) do
       for st in optmatch(ss,elements.strings) do
-        local el, pre = parse_element(st,pc)
+        local el,pre = parse_element(st,pc)
         if pre then
-          pl = pl .. pre
-          if el ~= "" then
-            pl = pl .. " " .. el
+          if el == "" then
+            el = pre
+          else
+            el = pre .. " " .. el
           end
-        else
-          pl = pl .. el
         end
+        if pc.newlamb then
+          if pc.lambargs then
+            el = pc.lambargs .. el
+          end
+          pc.lambargs = pc.newlamb
+          pc.newlamb = false
+          --print("newl:", pc.lambargs, el)
+        elseif pc.lambargs then
+          if el:match(elements.names) or el:match(elements.lambda_args) then
+            pc.lambargs = pc.lambargs .. el
+            el = ""
+          elseif el ~= "" then
+            el = pc.lambargs .. el
+            pc.lambargs = false
+            --print("notl:", el)
+          end
+        end
+        pl = pl .. el
         if pc.linestart then
           pc.linestart = false
         end
@@ -214,6 +251,7 @@ local function parse_line(l,pc)
   return pl
 end
 
+--TODO: make functions handling the ifend and lambargs
 function parser.translate_venus(file)
   local fc = ""
   local pc = {instring == false, opencurly = {}, line = 0}
@@ -229,7 +267,11 @@ function parser.translate_venus(file)
       end
       pc.ifend = false
     end
-    fc = fc .. "\n"
+    if pc.lambargs then
+      pc.lambargs = pc.lambargs .. "\n"
+    else
+      fc = fc .. "\n"
+    end
   end
   if (#pc.opencurly > 0) then
     parser.warn("not all curly brackets were closed")
