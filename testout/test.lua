@@ -14,19 +14,19 @@ for i,el in pairs(testt) do
 	print(i.." = "..el)
 end
 
-foreach el in testt do
+for _, el in pairs(testt ) do
 	print(el)
 end
 
-// comment
-## comment
-//comment
+-- comment
+-- comment
+--comment
 assert("//"=="/".."/")
 -- comment
 assert([[
 ##]]=="#".."#","comment within [[string]] falsely detected")
 
-fn a()
+function a()
 	return "function"
 end
 
@@ -35,53 +35,53 @@ assert([[
 fn]]=="f".."n")
 
 do
-	(fn(...)
+	(function(...)
 		local a = {...}
-		foreach a in a do
+		for _, a in pairs(a ) do
 			print(a)
 		end
 	end)("a","still a","also a")
 end
 
-{
+do 
 	local a = 12
 	print(a)
-}
+end
 a()
 
-function t() {
+function t() 
 	return "hi"
-}
+end
 assert(t()=="hi")
 
-fn t2() {
+function t2() 
 	return "also hi"
-}
+end
 assert(t2()=="also hi")
 
-if (true) {
+if (true)  then
 	print("weewoo")
-}
+ end
 
-for i = 0, 10 {
+for i = 0, 10  do
 	print(i)
-}
+end
 
-foreach el in {"lot's of test",2,"3",1} {
+for _, el in pairs({"lot's of test",2,"3",1} ) do
 	print(el)
-}
+end
 
-{
+do 
 	local i = 0
-	while i < 10 {
+	while i < 10  do
 		i = i + 1
-		if i%3 == 0 {
+		if i%3 == 0  then
 			print(i)
-		} elseif i%4 == 0 {
+		 elseif i%4 == 0  then
 			print(i/4)
-		}
-	}
-}
+		 end
+	end
+end
 
 print("test end")
 
