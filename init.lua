@@ -9,6 +9,8 @@ local elements = {
   lambda_args = "[,%(%)]"
 }
 
+--FIXME: do not parse in single line comments
+
 function parser.warn(msg)
   print("VenusParser warning: " .. msg)
 end
@@ -65,6 +67,17 @@ local function parse_element(el,pc)
     pc.ifend = false
   end
   
+  if pc.deccheck then
+    local cpos = pc.deccheck
+    pc.deccheck = false
+    pc.optassign = false
+    if cpos == true then
+      return "--"..el
+    else
+      return "--"..cpos..el
+    end
+  end
+  
   if el == "=>" then
     if not pc.lambargs then
       parser.warn(("invalid lambda in line %i"):format(pc.line))
@@ -78,7 +91,7 @@ local function parse_element(el,pc)
     return "function" .. larg .. " "
   elseif pc.lambend then
     if prefix then
-      parser.warn("end statement and lambda match end may be mixed")
+      parser.warn(("end statement and lambda match end may be mixed in line %i"):format(pc.line))
       prefix = pc.lambargs .. prefix
     else
       prefix = pc.lambargs
@@ -210,6 +223,22 @@ local function parse_element(el,pc)
     if not pc.instring then
       return "--",prefix
     end
+  elseif el == "--" then
+    if pc.optassign then
+      pc.deccheck = true
+      return "",prefix
+    else
+      return el,prefix
+    end
+  elseif el == "++" then
+    if pc.optassign then
+      local nam = pc.optassign
+      pc.optassign = false
+      return " = " .. nam .. " + 1"
+    else
+      parser.warn(("empty increment in line %i"):format(pc.line))
+      return el, prefix
+    end
   end
   --print(el,pc.instring and "in string" or "")
   return el, prefix
@@ -223,18 +252,52 @@ local function parse_line(l,pc)
     if s then
       if pc.lambargs then
         pc.lambargs = pc.lambargs .. sp
+      elseif pc.deccheck then
+        if pc.deccheck == true then
+          pc.deccheck = sp
+        else
+          pc.deccheck = pc.deccheck .. sp
+        end
       else
         pl = pl .. sp
+      end
+      if pc.optassign then
+        if pc.optassign ~= true then
+          pc.optassign = pc.optassign .. sp
+        end
       end
     else
       for sc in optmatch(sp,elements.special_combined) do
       for ss in optmatch(sc,elements.special) do
       for st in optmatch(ss,elements.strings) do
         local el,pre = parse_element(st,pc)
+        local lpre
         if pre then
+          while pre:match("\n") do
+            if lpre then
+              lpre = lpre .. pre:sub(1,pre:find("\n"))
+            else
+              lpre = pre:sub(1,pre:find("\n"))
+            end
+            pre = pre:sub(pre:find("\n")+1)
+          end
+          local pres = pre:match("^%s*") or ""
+          if lpre then
+            lpre = lpre .. pres
+          else
+            lpre = pres
+          end
+          pre = pre:sub(#pres+1)
+          --[[
+          if (pre ~= "") then
+            print("pre:".. pre..":")
+          else
+            print("prel:" .. el)
+          end
+          --]]
           if el == "" then
             el = pre
-          else
+          elseif pre ~= "" then
             el = pre .. " " .. el
           end
         end
@@ -256,7 +319,22 @@ local function parse_line(l,pc)
             --print("notl:", el)
           end
         end
-        pl = pl .. el
+        if pc.optassign and el ~= "" then
+          if pc.linestart and el:match(elements.names) then
+            if pc.optassign == true then
+              pc.optassign = el
+            else
+              pc.optassign = pc.optassign .. el
+            end
+          elseif el ~= "--" then
+            pc.optassign = false
+          end
+        end
+        if lpre then
+          pl = pl .. lpre .. el
+        else
+          pl = pl .. el
+        end
         if pc.linestart then
           pc.linestart = false
         end
@@ -271,10 +349,11 @@ end
 --TODO: make functions handling the ifend and lambargs
 function parser.translate_venus(file)
   local fc = ""
-  local pc = {instring == false, opencurly = {}, line = 0}
+  local pc = {instring = false, opencurly = {}, line = 0}
   for l in io.lines(file) do
     pc.line = pc.line + 1
     pc.linestart = true
+    pc.optassign = true
     fc = fc .. parse_line(l,pc)
     if pc.ifend then
       if pc.linestart then
@@ -283,6 +362,17 @@ function parser.translate_venus(file)
         fc = fc .. " " .. pc.ifend
       end
       pc.ifend = false
+    end
+    if pc.deccheck then
+      if pc.optassign == false then
+        pc.deccheck = false
+      elseif pc.optassign == true then
+        pc.deccheck = false
+      else
+        fc = fc .. " = " .. pc.optassign .. " - 1"
+        pc.deccheck = false
+        pc.optassign = false
+      end
     end
     if pc.lambargs then
       pc.lambargs = pc.lambargs .. "\n"

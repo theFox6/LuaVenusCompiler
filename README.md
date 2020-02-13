@@ -101,6 +101,26 @@ store_it(function(a,b)
 end)
 ```
 
+### incrrement and decrement
+`++` and `--` can be used to in/decrement by 1
+```lua
+local i = 0
+local j = 0
+
+i++
+j--
+```
+will generate
+```lua
+local i = 0
+local j = 0
+
+i = i + 1
+j = j - 1
+```
+`--` can also be a comment!  
+If there is anything behind a `--` the `--` treated as comment.
+
 ## working with the parser
 ### loading
 The init.lua returns a table containing the parser.  
@@ -128,6 +148,6 @@ It's argument can be a relative or absolute path to the file that should be tran
 It returns the generated lua as string.
 
 ##todo
-- increment, decrement, etc.
+- assignment statements
 - generate lua from a venus string
 - perhaps write generated lua files to disk

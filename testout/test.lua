@@ -20,7 +20,7 @@ end
 
 for _, el in pairs(testt ) do
 	print(el)
- end
+end
 
 -- comment
 -- comment
@@ -31,7 +31,7 @@ assert([[
 ##]]=="#".."#","comment within [[string]] falsely detected")
 
 function a()
-	 return "function"
+	return "function"
 end
 
 assert(a() =="function")
@@ -43,17 +43,17 @@ do
 		local a = {...}
 		for _, a in pairs(a ) do
 			print(a)
-		 end
+		end
 	end)("a","still a","also a")
 end
 
 do 
 	local a = 12
 	print(a)
- end
+end
 a()
 
- function t() 
+function t() 
 	return "hi"
 end
 assert(t() =="hi")
@@ -69,11 +69,11 @@ if (true)   then
 
 for i = 0, 10  do
 	print(i)
- end
+end
 
 for _, el in pairs({"lot's of test",2,"3",1} ) do
 	print(el)
- end
+end
 
 do 
 	local i = 0
@@ -88,8 +88,8 @@ do
 end
 
 function callit(fun,t1,t2)
-	 return fun(t1,t2)
- end
+	return fun(t1,t2)
+end
 
 assert(
 	callit(function()   
@@ -110,19 +110,39 @@ assert(
 	end, 10, 6) == 16
 )
 
-print("test end")
+---
+--comment
 
---[[ coming soon
+
 local i = 0
 local j = 0
 
 i = i + 1
 j = j + 2
-i++
-j += 2
 
-function dec(n)
-	n--
-	return n-- not a decrement, only returns n, this is a comment
+function decj()
+	j = j - 1
+	return j-- not a decrement, only returns n, this is a comment
 end
+assert(decj() ==1)
+assert(j == 1)
+
+function reti()
+	-- this only returns i the -- is a comment
+	return i--
+end
+
+i = i + 1
+assert(reti()  == 2)
+
+-- () => {}
+
+print("test end")
+
+--[[ coming soon
+j += 3
+j *=-8
+j /=-4
+j ^= 2
+j -= 32
 --]]
