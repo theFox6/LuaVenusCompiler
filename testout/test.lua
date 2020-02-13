@@ -137,12 +137,17 @@ assert(reti()  == 2)
 
 -- () => {}
 
-print("test end")
+j= j+ 3
+assert(j == 4)
+j = j *-8
+assert(j ==-32)
+j = j / -4
+assert(j== 8)
+j = j ^ 2
+assert(j == 64)
+j= j- 32
+assert(j ==32)
+j = j .." test"
+assert(j == "32 test")
 
---[[ coming soon
-j += 3
-j *=-8
-j /=-4
-j ^= 2
-j -= 32
---]]
+print("test end")

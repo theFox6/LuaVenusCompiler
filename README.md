@@ -121,6 +121,40 @@ j = j - 1
 `--` can also be a comment!  
 If there is anything behind a `--` the `--` treated as comment.
 
+### assignments
+Assignment operators `+=`, `-=`, `*=`, `/=`, `^=` and `.=` can be used.
+```lua
+local a = 0
+-- increment
+a += 2
+-- decrement
+a -= 1
+-- multiply
+a *= 8
+-- divide
+a /= 2
+-- to the power of
+a ^= 3
+-- concatenate string
+a .= " str"
+```
+will generate
+```lua
+local a = 0
+-- increment
+a = a + 2
+-- decrement
+a = a - 1
+-- multiply
+a = a * 8
+-- divide
+a = a / 2
+-- to the power of
+a = a ^ 3
+-- concatenate string
+a = a .. " str"
+```
+
 ## working with the parser
 ### loading
 The init.lua returns a table containing the parser.  
@@ -148,6 +182,6 @@ It's argument can be a relative or absolute path to the file that should be tran
 It returns the generated lua as string.
 
 ##todo
-- assignment statements
 - generate lua from a venus string
 - perhaps write generated lua files to disk
+- perhaps generate venus from lua

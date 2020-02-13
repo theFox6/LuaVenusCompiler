@@ -239,6 +239,54 @@ local function parse_element(el,pc)
       parser.warn(("empty increment in line %i"):format(pc.line))
       return el, prefix
     end
+  elseif el == "+=" then
+    if pc.optassign then
+      local nam = pc.optassign
+      pc.optassign = false
+      return "= " .. nam .. "+"
+    else
+      parser.warn(("empty increment assignment in line %i"):format(pc.line))
+    end
+  elseif el == "-=" then
+    if pc.optassign then
+      local nam = pc.optassign
+      pc.optassign = false
+      return "= " .. nam .. "-"
+    else
+      parser.warn(("empty decrement assignment in line %i"):format(pc.line))
+    end
+  elseif el == "*=" then
+    if pc.optassign then
+      local nam = pc.optassign
+      pc.optassign = false
+      return "= " .. nam .. "*"
+    else
+      parser.warn(("empty multiply assignment in line %i"):format(pc.line))
+    end
+  elseif el == "/=" then
+    if pc.optassign then
+      local nam = pc.optassign
+      pc.optassign = false
+      return "= " .. nam .. "/"
+    else
+      parser.warn(("empty divide assignment in line %i"):format(pc.line))
+    end
+  elseif el == "^=" then
+    if pc.optassign then
+      local nam = pc.optassign
+      pc.optassign = false
+      return "= " .. nam .. "^"
+    else
+      parser.warn(("empty power assignment in line %i"):format(pc.line))
+    end
+  elseif el == ".=" then
+    if pc.optassign then
+      local nam = pc.optassign
+      pc.optassign = false
+      return "= " .. nam .. ".."
+    else
+      parser.warn(("empty concatenation assignment in line %i"):format(pc.line))
+    end
   end
   --print(el,pc.instring and "in string" or "")
   return el, prefix
