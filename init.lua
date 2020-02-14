@@ -461,4 +461,11 @@ function parser.dovenus(file)
   return ff()
 end
 
+function parser.convert_venus_file(venus_file_in,lua_file_out)
+  local s = parser.tl_venus_file(venus_file_in)
+  local f = io.open(lua_file_out,"w")
+  f:write(s)
+  f:close()
+end
+
 return parser

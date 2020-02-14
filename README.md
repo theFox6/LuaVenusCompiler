@@ -184,6 +184,7 @@ It returns the generated lua as string.
 `vp.tl_venus_string(str)` returns the lua generated from the given string  
 It returns the generated lua as string.
 
-## todo
-- perhaps write generated lua files to disk
-- perhaps generate venus from lua
+### generating lua files
+`vp.convert_venus_file(venus_file_in,lua_file_out)` generates a lua file  
+It's arguments can be relative or absolute paths.  
+The venus_file_in will be converted to lua and written to lua_file_out.
