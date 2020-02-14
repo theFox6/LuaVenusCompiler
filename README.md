@@ -24,8 +24,8 @@ end
 ```
 
 ### comments
-for comments --, // and ## can be used
-if something follows a -- it will always be treated as comment
+for comments `--`, `//` and `##` can be used
+if something follows a `--` it will always be treated as comment
 
 ### curly braces
 The `do`,`then` and `end` statements can be replaced by curly brace syntax.  
@@ -181,7 +181,7 @@ It returns a function that runs the generated lua.
 It's argument can be a relative or absolute path to the file that should be translated.  
 It returns the generated lua as string.
 
-##todo
+## todo
 - generate lua from a venus string
 - perhaps write generated lua files to disk
 - perhaps generate venus from lua

@@ -1,93 +1,130 @@
-print("venus test")
+print("running venus test script")
 
-local testt = {
-	venus = "awesome",
-	"lots of test",1,2,
-	test2 = "hi"
-}
+local vp_util = dofile("vp_util.lua")
 
-local a = 0
+local function for_range_test()
+	local a = 0
 
-for i = 0,5 do
-	a = a + i
+	for i = 0,5 do
+		a = a + i
+	end
+
+	assert(a == 15)
 end
 
-assert(a == 15)
+for_range_test()
 
-for i,el in pairs(testt) do
-	print(i.." = "..el)
+local function for_in_test()
+	local testt = {
+		venus = "awesome",
+		"lots of test",1,2,
+		test2 = "hi"
+	}
+
+	local reft = {}
+	for i,el in pairs(testt) do
+		reft[i] = el
+	end
+	assert(vp_util.dftc(reft, testt))
+
+	reft = {}
+	for _,el in pairs(testt) do
+		table.insert(reft,el)
+	end
+
+	local reft2 = {}
+	foreach el in testt do
+		table.insert(reft2,el)
+	end
+	assert(vp_util.dftc(reft, reft2))
 end
 
-foreach el in testt do
-	print(el)
-end
+for_in_test()
 
-// comment
-## comment
+// comments
+## yay a comment
 //comment
 assert("//"=="/".."/")
--- comment
+-- another comment
 assert([[
 ##]]=="#".."#","comment within [[string]] falsely detected")
 
-fn a()
-	return "function"
-end
-
-assert(a()=="function")
 assert([[
 fn]]=="f".."n")
 
-do
-	(fn(...)
-		local a = {...}
-		foreach a in a do
-			print(a)
-		end
-	end)("a","still a","also a")
+local function shadow_test()
+	local fn a()
+		return "function"
+	end
+	assert(a()=="function")
+
+	local reft = {}
+	do
+		(fn(...)
+			local a = {...}
+			foreach a in a do
+				table.insert(reft,a)
+			end
+		end)("a","still a","also a")
+	end
+	assert(vp_util.dftc(reft, {"a","still a","also a"}))
+
+	local n
+	{
+		local a = 12
+		n = a
+	}
+	assert(n == 12)
+
+	assert(a()=="function")
 end
 
-{
-	local a = 12
-	print(a)
-}
-a()
+shadow_test()
 
-function t() {
+local function t() {
 	return "hi"
 }
 assert(t()=="hi")
 
-fn t2() {
+local fn t2() {
 	return "also hi"
 }
+assert(type(t2)=="function")
 assert(t2()=="also hi")
 
+local b = true
 if (true) {
-	print("weewoo")
+	b = "weewoo"
 }
+assert(b == "weewoo")
 
+local reft = {}
 for i = 0, 10 {
-	print(i)
+	table.insert(reft,i)
 }
+assert(vp_util.dftc(reft,{0,1,2,3,4,5,6,7,8,9,10}))
 
+local reft2 = {}
 foreach el in {"lot's of test",2,"3",1} {
-	print(el)
+	table.insert(reft2,el)
 }
+assert(vp_util.dftc(reft2,{"lot's of test",2,"3",1}))
 
 {
+	local reft = {}
 	local i = 0
 	while i < 10 {
 		i = i + 1
 		if i%3 == 0 {
-			print(i)
+			table.insert(reft,i)
 		} elseif i%4 == 0 {
-			print(i/4)
+			table.insert(reft,i/4)
 		}
 	}
+	assert(vp_util.dftc(reft,{3,1,6,2,9}))
 }
 
-function callit(fun,t1,t2)
+local function callit(fun,t1,t2)
 	return fun(t1,t2)
 end
 
@@ -110,6 +147,8 @@ assert(
 	}, 10, 6) == 16
 )
 
+assert(callit(()=>{},false)==nil)
+
 ---
 --comment
 --
@@ -120,14 +159,14 @@ local j = 0
 i = i + 1
 j = j + 2
 
-function decj()
+local function decj()
 	j--
 	return j-- not a decrement, only returns n, this is a comment
 end
 assert(decj()==1)
 assert(j == 1)
 
-function reti()
+local fn reti()
 	-- this only returns i the -- is a comment
 	return i--
 end
@@ -150,4 +189,4 @@ assert(j ==32)
 j .=" test"
 assert(j == "32 test")
 
-print("test end")
+print("venus test end")
