@@ -358,7 +358,7 @@ local function parse_line(l,pc)
           else
             pl = pl .. el
           end
-          if pc.linestart then
+          if pc.linestart and el ~= "" then
             pc.linestart = false
           end
         end
@@ -368,49 +368,80 @@ local function parse_line(l,pc)
   return pl
 end
 
---TODO: make functions handling the ifend and lambargs
-function parser.translate_venus(file)
+local function handle_linestart(pc)
+  pc.line = pc.line + 1
+  pc.linestart = true
+  pc.optassign = true
+end
+
+local function handle_lineend_curly(pc)
+  if pc.ifend then
+    local ret
+    if pc.linestart then
+      ret = pc.ifend
+    else
+      ret = " " .. pc.ifend
+    end
+    pc.ifend = false
+    return ret
+  end
+  return ""
+end
+
+local function handle_lineend_decrement(pc)
+  if pc.deccheck then
+    if pc.optassign == false then
+      pc.deccheck = false
+    elseif pc.optassign == true then
+      pc.deccheck = false
+    else
+      local ret = " = " .. pc.optassign .. " - 1"
+      pc.deccheck = false
+      pc.optassign = false
+      return ret
+    end
+  end
+  return ""
+end
+
+local function handle_lineend_lambargs(pc)
+  if pc.lambargs then
+    pc.lambargs = pc.lambargs .. "\n"
+  else
+    return "\n"
+  end
+  return ""
+end
+
+function parser.tl_venus_string(str)
   local fc = ""
   local pc = {instring = false, opencurly = {}, line = 0}
-  for l in io.lines(file) do
-    pc.line = pc.line + 1
-    pc.linestart = true
-    pc.optassign = true
-    fc = fc .. parse_line(l,pc)
-    if pc.slcomm then
-      pc.slcomm = false
-      fc = fc .. "\n"
-    else
-      if pc.ifend then
-        if pc.linestart then
-          fc = fc .. pc.ifend
-        else
-          fc = fc .. " " .. pc.ifend
-        end
-        pc.ifend = false
-      end
-      if pc.deccheck then
-        if pc.optassign == false then
-          pc.deccheck = false
-        elseif pc.optassign == true then
-          pc.deccheck = false
-        else
-          fc = fc .. " = " .. pc.optassign .. " - 1"
-          pc.deccheck = false
-          pc.optassign = false
-        end
-      end
-      if pc.lambargs then
-        pc.lambargs = pc.lambargs .. "\n"
-      else
+  for l,e in vp_util.optmatch(str,"\n") do
+    if e then
+      if pc.slcomm then
+        pc.slcomm = false
         fc = fc .. "\n"
+      else
+        fc = fc .. handle_lineend_curly(pc)
+        fc = fc .. handle_lineend_decrement(pc)
+        fc = fc .. handle_lineend_lambargs(pc)
       end
+    else
+      handle_linestart(pc)
+      fc = fc .. parse_line(l,pc)
     end
   end
   if (#pc.opencurly > 0) then
     parser.warn("not all curly brackets were closed")
   end
   return fc
+end
+
+function parser.tl_venus_file(file)
+  local f = io.open(file)
+  local ret = parser.tl_venus_string(f:read("*a"))
+  f:close()
+  return ret
 end
 
 function parser.loadvenus(file,env)

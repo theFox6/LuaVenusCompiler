@@ -177,11 +177,13 @@ It's argument can be a relative or absolute path to the file that should be load
 It returns a function that runs the generated lua.
 
 ### generating lua code
-`vp.translate_venus(file)` returns the lua generated from the files contents  
+`vp.tl_venus_file(file)` returns the lua generated from the files contents  
 It's argument can be a relative or absolute path to the file that should be translated.  
 It returns the generated lua as string.
 
+`vp.tl_venus_string(str)` returns the lua generated from the given string  
+It returns the generated lua as string.
+
 ## todo
-- generate lua from a venus string
 - perhaps write generated lua files to disk
 - perhaps generate venus from lua

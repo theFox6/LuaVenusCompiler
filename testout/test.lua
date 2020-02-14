@@ -95,7 +95,7 @@ assert(t2() =="also hi")
 local b = true
 if (true)   then
 	b = "weewoo"
- end
+end
 assert(b == "weewoo")
 
 local reft = {}
@@ -119,7 +119,7 @@ do
 			table.insert(reft,i)
 		 elseif i%4 == 0  then
 			table.insert(reft,i/4)
-		 end
+		end
 	end
 	assert(vp_util.dftc(reft,{3,1,6,2,9}))
 end
