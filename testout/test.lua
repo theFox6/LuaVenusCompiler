@@ -189,4 +189,18 @@ assert(j ==32)
 j = j .." test"
 assert(j == "32 test")
 
+local tt = {
+  {"hello", "there"},
+  {"venus", "test"}
+}
+
+local function concatsub(t) 
+	local ret = {}
+	for _, el in pairs(t ) do
+	  table.insert(ret,table.concat(el," "))
+	end
+	return ret
+end
+assert(vp_util.dftc(concatsub(tt) ,{"hello there", "venus test"}))
+
 print("venus test end")

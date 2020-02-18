@@ -442,7 +442,7 @@ function parser.tl_venus_file(file)
 end
 
 function parser.loadvenus(file,env)
-  local fc = parser.translate_venus(file)
+  local fc = parser.tl_venus_file(file)
   if env then
     return loadstring(fc,"@"..file,"t",env)
   else
