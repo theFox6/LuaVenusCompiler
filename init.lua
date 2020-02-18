@@ -103,15 +103,11 @@ local function parse_element(el,pc)
       pc.curlyopt = false
       return ") do",prefix
     elseif not pc.curlyopt then
-      if pc.linestart then
-        table.insert(pc.opencurly, "do")
-        return "do ",prefix
-      else
-        table.insert(pc.opencurly, "table")
-        return el,prefix
-      end
+      table.insert(pc.opencurly, "table")
+      return el,prefix
     elseif pc.curlyopt == true then
-      if pc.precurly == "function" or pc.precurly == "repeat" or pc.precurly == "else" then
+      if pc.precurly == "function" or pc.precurly == "repeat" or
+          pc.precurly == "else" or pc.precurly == "do" then
         table.insert(pc.opencurly, pc.precurly)
         pc.precurly = false
         pc.curlyopt = false
@@ -160,7 +156,8 @@ local function parse_element(el,pc)
       pc.foreach = 2
     end
   elseif el == "do" then
-    pc.curlyopt = false
+    pc.curlyopt = true
+    pc.precurly = "do"
     if pc.foreach == 3 then
       pc.foreach = 0
       return ") " .. el,prefix

@@ -32,34 +32,38 @@ The `do`,`then` and `end` statements can be replaced by curly brace syntax.
 They can be used in functions, loops, conditions.  
 For example:
 ```lua
-local table = {2,1,3,"test","test2",3}
+do {
+	local table = {2,1,3,"test","test2",3}
 
-function findTest(t) {
-	repeat {
-		local found = false
-		local el = table.remove(t)
-		if el == "test" {
-			found = true
-		} else {
-			print(el)
-		}
-	} until found
+	function findTest(t) {
+		repeat {
+			local found = false
+			local el = table.remove(t)
+			if el == "test" {
+				found = true
+			} else {
+				print(el)
+			}
+		} until found
+	}
 }
 ```
 will generate
 ```lua
-local table = {2,1,3,"test","test2",3}
+do
+	local table = {2,1,3,"test","test2",3}
 
-function findTest(t) 
-	repeat
-		local found = false
-		local el = table.remove(t)
-		if el == "test" then
-			found = true
-		else
-			print(el)
-		end
-	until found
+	function findTest(t) 
+		repeat
+			local found = false
+			local el = table.remove(t)
+			if el == "test" then
+				found = true
+			else
+				print(el)
+			end
+		until found
+	end
 end
 ```
 
