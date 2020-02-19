@@ -126,6 +126,46 @@ function vp_util.dftc(t1,t2)
 end
 
 ---
+--concatenate strings
+--if one string is nil the other is returned
+--
+--@function [parent=#vp_util] concat_optnil
+--@param #string fstr the first string to be concatenated
+--@param #string lstr the second string to be concatenated
+--@param #string sep the seperator to be added between the strings if both are present
+--@param #string retstr The string returned if both strings are empty.
+--  Can be true to return an empty string.
+function vp_util.concat_optnil(fstr,lstr,sep,retstr)
+  if fstr then
+    if lstr then
+      if sep then
+        if fstr == "" or lstr == "" then
+          return fstr..lstr
+        else
+          return fstr..sep..lstr
+        end
+      else
+        return fstr..lstr
+      end
+    else
+      return fstr
+    end
+  else
+    if lstr then
+      return lstr
+    else
+      if retstr == true then
+        return ""
+      elseif retstr then
+        return retstr
+      else
+        return nil
+      end
+    end 
+  end
+end
+
+---
 --The unit tests for the vp utilities.
 local function tests()
   assert(vp_util.dftc({},{}))

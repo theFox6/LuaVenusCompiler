@@ -22,13 +22,13 @@ local function for_in_test()
 	}
 
 	local reft = {}
-	for i,el in pairs(testt)  do
+	for i,el in pairs(testt) do
 		reft[i] = el
 	end
-	assert(vp_util.dftc(reft, testt) )
+	assert(vp_util.dftc(reft, testt))
 
 	reft = {}
-	for _,el in pairs(testt)  do
+	for _,el in pairs(testt) do
 		table.insert(reft,el)
 	end
 
@@ -36,7 +36,7 @@ local function for_in_test()
 	for _, el in pairs(testt ) do
 		table.insert(reft2,el)
 	end
-	assert(vp_util.dftc(reft, reft2) )
+	assert(vp_util.dftc(reft, reft2))
 end
 
 for_in_test()
@@ -56,7 +56,7 @@ local function shadow_test()
 	local function a()
 		return "function"
 	end
-	assert(a() =="function")
+	assert(a()=="function")
 
 	local reft = {}
 	do
@@ -76,7 +76,7 @@ local function shadow_test()
 	end
 	assert(n == 12)
 
-	assert(a() =="function")
+	assert(a()=="function")
 end
 
 shadow_test()
@@ -84,16 +84,16 @@ shadow_test()
 local function t() 
 	return "hi"
 end
-assert(t() =="hi")
+assert(t()=="hi")
 
 local function t2() 
 	return "also hi"
 end
-assert(type(t2) =="function")
-assert(t2() =="also hi")
+assert(type(t2)=="function")
+assert(t2()=="also hi")
 
 local b = true
-if (true)   then
+if (true)  then
 	b = "weewoo"
 end
 assert(b == "weewoo")
@@ -163,7 +163,7 @@ local function decj()
 	j = j - 1
 	return j-- not a decrement, only returns n, this is a comment
 end
-assert(decj() ==1)
+assert(decj()==1)
 assert(j == 1)
 
 local function reti()
@@ -172,7 +172,7 @@ local function reti()
 end
 
 i = i + 1
-assert(reti()  == 2)
+assert(reti() == 2)
 
 -- () => {}
 
@@ -201,6 +201,6 @@ local function concatsub(t)
 	end
 	return ret
 end
-assert(vp_util.dftc(concatsub(tt) ,{"hello there", "venus test"}))
+assert(vp_util.dftc(concatsub(tt),{"hello there", "venus test"}))
 
 print("venus test end")

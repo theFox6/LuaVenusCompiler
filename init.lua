@@ -263,93 +263,112 @@ local function parse_element(el,pc)
   return el, prefix
 end
 
---TODO: make functions handling the lambdas
+local function store_space(sp,pc)
+  if pc.optassign then
+    if pc.optassign ~= true then
+      pc.optassign = pc.optassign .. sp
+    end
+  end
+  if pc.lambargs then
+    pc.lambargs = pc.lambargs .. sp
+    return false
+  elseif pc.deccheck then
+    if pc.deccheck == true then
+      pc.deccheck = sp
+      return false
+    else
+      pc.deccheck = pc.deccheck .. sp
+      return false
+    end
+  else
+    return true
+  end
+end
+
+local function handle_prefix(el,p)
+  local pre = p
+  local lpre
+  if pre then
+    while pre:match("\n") do
+      if lpre then
+        lpre = lpre .. pre:sub(1,pre:find("\n"))
+      else
+        lpre = pre:sub(1,pre:find("\n"))
+      end
+      pre = pre:sub(pre:find("\n")+1)
+    end
+    local pres = pre:match("^%s*") or ""
+    if lpre then
+      lpre = lpre .. pres
+    else
+      lpre = pres
+    end
+    pre = pre:sub(#pres+1)
+    --[[
+    if (pre ~= "") then
+      print("pre:".. pre..":")
+    else
+      print("prel:" .. el)
+    end
+    --]]
+    return vp_util.concat_optnil(pre,el),lpre
+  end
+  return el
+end
+
+local function store_lambargs(e,pc)
+  local el = e
+  if pc.newlamb then
+    if pc.lambargs then
+      el = pc.lambargs .. el
+    end
+    pc.lambargs = pc.newlamb
+    pc.newlamb = false
+    --print("newl:", pc.lambargs, el)
+  elseif pc.lambargs then
+    if el:match(elements.names) or el:match(elements.lambda_args) then
+      pc.lambargs = pc.lambargs .. el
+      el = ""
+    elseif el ~= "" then
+      el = pc.lambargs .. el
+      pc.lambargs = false
+      pc.lambend = false
+      --print("notl:", el)
+    end
+  end
+  return el
+end
+
+local function store_optassign(el,pc)
+  if pc.optassign and el ~= "" then
+    if pc.linestart and el:match(elements.names) then
+      if pc.optassign == true then
+        pc.optassign = el
+      else
+        pc.optassign = pc.optassign .. el
+      end
+    elseif el ~= "--" then
+      pc.optassign = false
+    end
+  end
+end
+
 local function parse_line(l,pc)
   local pl = ""
   local i = 0
   for sp,s in vp_util.optmatch(l,elements.spaces) do
     if s then
-      if pc.lambargs then
-        pc.lambargs = pc.lambargs .. sp
-      elseif pc.deccheck then
-        if pc.deccheck == true then
-          pc.deccheck = sp
-        else
-          pc.deccheck = pc.deccheck .. sp
-        end
-      else
+      if store_space(sp,pc) then
         pl = pl .. sp
-      end
-      if pc.optassign then
-        if pc.optassign ~= true then
-          pc.optassign = pc.optassign .. sp
-        end
       end
     else
       for st in vp_util.optmatch(sp,non_space_elements) do
         if pc.slcomm then
           pl = pl .. st
         else
-          local el,pre = parse_element(st,pc)
-          local lpre
-          if pre then
-            while pre:match("\n") do
-              if lpre then
-                lpre = lpre .. pre:sub(1,pre:find("\n"))
-              else
-                lpre = pre:sub(1,pre:find("\n"))
-              end
-              pre = pre:sub(pre:find("\n")+1)
-            end
-            local pres = pre:match("^%s*") or ""
-            if lpre then
-              lpre = lpre .. pres
-            else
-              lpre = pres
-            end
-            pre = pre:sub(#pres+1)
-            --[[
-            if (pre ~= "") then
-              print("pre:".. pre..":")
-            else
-              print("prel:" .. el)
-            end
-            --]]
-            if el == "" then
-              el = pre
-            elseif pre ~= "" then
-              el = pre .. " " .. el
-            end
-          end
-          if pc.newlamb then
-            if pc.lambargs then
-              el = pc.lambargs .. el
-            end
-            pc.lambargs = pc.newlamb
-            pc.newlamb = false
-            --print("newl:", pc.lambargs, el)
-          elseif pc.lambargs then
-            if el:match(elements.names) or el:match(elements.lambda_args) then
-              pc.lambargs = pc.lambargs .. el
-              el = ""
-            elseif el ~= "" then
-              el = pc.lambargs .. el
-              pc.lambargs = false
-              pc.lambend = false
-              --print("notl:", el)
-            end
-          end
-          if pc.optassign and el ~= "" then
-            if pc.linestart and el:match(elements.names) then
-              if pc.optassign == true then
-                pc.optassign = el
-              else
-                pc.optassign = pc.optassign .. el
-              end
-            elseif el ~= "--" then
-              pc.optassign = false
-            end
-          end
+          local el,lpre = handle_prefix(parse_element(st,pc))
+          el = store_lambargs(el,pc)
+          store_optassign(el,pc)
           if lpre then
             pl = pl .. lpre .. el
           else
