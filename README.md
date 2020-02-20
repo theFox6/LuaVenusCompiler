@@ -161,15 +161,19 @@ a = a .. " str"
 
 ## working with the parser
 ### loading
-The init.lua returns a table containing the parser.  
+The init.lua returns a function for loading the parser.  
+You have to call it with the path to the script itself as argument.  
 In case you have the VenusParser directory within your project's  
 ways of loding it may be:
 ```lua
--- using require (cached)
-local vc = require("VenusParser")
--- using dofile
-local vc = dofile("VenusParser/init.lua")
+--in case your project is run within it's own folder
+local vc = dofile("VenusParser/init.lua")("VenusParser/")
+--in case you have a variable called project_loc containing the path to your projects folder
+local vc = dofile(project_loc.."/VenusParser/init.lua")(project_loc.."/VenusParser/")
+--using require
+local vc = require("VenusParser")("VenusParser/")
 ```
+When it is loaded it can also be accessed with the global called "VenusParser".
 
 ### running venus files
 `vc.dovenus(file)` works like `dofile(file)`  

@@ -91,7 +91,7 @@ end
 --A function generating a table from an iterator.
 --
 --@function [parent=#vp_util] gen_table
---@param #function it the iterator to use in a for loop 
+--@param #function it the iterator to use in a for loop
 --@return #table the table containing the returns of the iterator
 function vp_util.gen_table(it)
   local tab = {}
@@ -102,7 +102,8 @@ function vp_util.gen_table(it)
 end
 
 ---
---double flat table compare  
+--**double flat table compare**
+--
 --A function comparing the contents of two tables.
 --
 --It iterates over both tables checking if the other contains the same elements.
@@ -161,7 +162,7 @@ function vp_util.concat_optnil(fstr,lstr,sep,retstr)
       else
         return nil
       end
-    end 
+    end
   end
 end
 
@@ -173,7 +174,7 @@ local function tests()
   assert(not vp_util.dftc({1},{2}))
   assert(vp_util.dftc({1,"2",true},{1,"2",true}))
   assert(not vp_util.dftc({true,"1",1},{1,1,1}))
-  
+
   assert(vp_util.dftc(vp_util.gen_table(vp_util.optmatch("123","123")),{"123"}))
   assert(vp_util.dftc(vp_util.gen_table(vp_util.optmatch("123","321")),{"123"}))
   assert(vp_util.dftc(vp_util.gen_table(vp_util.optmatch("123", "1")), {"1","23"}))
