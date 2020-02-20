@@ -18,12 +18,15 @@ function parser.warn(msg)
   print("VenusParser warning: " .. msg)
 end
 
+--TODO: check if spaces before a curly brace were already added
+
 --TODO: make some functions handling each group of commands
 local function parse_element(el,pc)
   if el == "" then
     return el
   end
   local prefix
+  local precurlch = false
   if el == "elseif" then
     if pc.ifend then
       pc.ifend = false
@@ -33,8 +36,13 @@ local function parse_element(el,pc)
     pc.ifend = false
     pc.curlyopt = true
     pc.precurly = el
+    precurlch = true
   elseif pc.ifend then
-    prefix = pc.ifend
+    if pc.linestart then
+      prefix = pc.ifend
+    else
+      prefix = " "..pc.ifend
+    end
     pc.ifend = false
   end
 
@@ -102,7 +110,7 @@ local function parse_element(el,pc)
       pc.foreach = 0
       table.insert(pc.opencurly, "for")
       pc.curlyopt = false
-      return ") do",prefix
+      return ") do ",prefix
     elseif not pc.curlyopt then
       table.insert(pc.opencurly, "table")
       return el,prefix
@@ -117,13 +125,13 @@ local function parse_element(el,pc)
     elseif pc.curlyopt == "for" or pc.curlyopt == "while" then
       table.insert(pc.opencurly, pc.curlyopt)
       pc.curlyopt = false
-      return " do",prefix
+      return " do ",prefix
     elseif pc.curlyopt == "if" then
       table.insert(pc.opencurly, pc.curlyopt)
       pc.curlyopt = false
-      return " then",prefix
+      return " then ",prefix
     end
-  elseif pc.precurly then
+  elseif pc.precurly and not precurlch then
     pc.precurly = false
     pc.curlyopt = false
   end
@@ -137,7 +145,11 @@ local function parse_element(el,pc)
     elseif closecurly == "for" or closecurly == "while" or
         closecurly == "function" or closecurly == "repeat" or
         closecurly == "do" or closecurly == "else" then
-      return "end",prefix
+      if pc.linestart then
+        return "end",prefix
+      else
+        return " end",prefix
+      end
     elseif closecurly == "if" then
       pc.ifend = "end"
       return "",prefix
@@ -312,7 +324,7 @@ local function handle_prefix(el,p)
       print("prel:" .. el)
     end
     --]]
-    return vp_util.concat_optnil(pre,el),lpre
+    return vp_util.concat_optnil(pre,el," "),lpre
   end
   return el
 end

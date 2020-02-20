@@ -119,7 +119,7 @@ do {
 			table.insert(reft,i)
 		} elseif i%4 == 0 {
 			table.insert(reft,i/4)
-		}
+		} else {}
 	}
 	assert(vp_util.dftc(reft,{3,1,6,2,9}))
 }
@@ -202,5 +202,7 @@ local fn concatsub(t) {
 	return ret
 }
 assert(vp_util.dftc(concatsub(tt),{"hello there", "venus test"}))
+
+assert(not (() => {if(true){return}return true})())
 
 print("venus test end")
