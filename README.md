@@ -1,4 +1,5 @@
 # venus lua parser
+[![luacheck][luacheck badge]][luacheck workflow]  
 A parser that loads venus files into lua. Written in lua.  
 The parser reads a venus file and replaces venus syntax by lua syntax.  
 It can also load and run the result.
@@ -196,3 +197,6 @@ It returns the generated lua as string.
 `vp.convert_venus_file(venus_file_in,lua_file_out)` generates a lua file  
 It's arguments can be relative or absolute paths.  
 The venus_file_in will be converted to lua and written to lua_file_out.
+
+[luacheck badge]: https://github.com/theFox6/VenusParser/workflows/luacheck/badge.svg
+[luacheck workflow]: https://github.com/theFox6/VenusParser/actions?query=workflow%3Aluacheck
