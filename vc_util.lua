@@ -1,8 +1,8 @@
 ---
---A module with lots of helpers for the VenusParser.
+--A module with lots of helpers for the LuaVenusCompiler.
 --
---@module vp_util
-local vp_util = {}
+--@module vc_util
+local vc_util = {}
 
 ---
 --Find the first match of a set of patterns within a string.
@@ -10,11 +10,11 @@ local vp_util = {}
 --The pattern, that can be found at the earliest position within the string is used to match.
 --If two patterns are at the same position the shorter match is returned.
 --
---@function [parent=#vp_util] find_min_match
+--@function [parent=#vc_util] find_min_match
 --@param #string str the string to be searched for the patterns
 --@param patterns the pattern or patterns that are searched within the string
 --@return the starting and the end position of the match
-function vp_util.find_min_match(str,patterns)
+function vc_util.find_min_match(str,patterns)
   local pats
   local patt = type(patterns)
   if patt == "string" then
@@ -55,15 +55,15 @@ end
 --Every sequence given to the iteration is removed from the iterator.
 --Like this it will traverse the string splitting it into the matches and non-matches.
 --
---@function [parent=#vp_util] optmatch
+--@function [parent=#vc_util] optmatch
 --@param #string str the string to search for matches
 --@param patterns the pattern or patterns to split by
 --@return #function the iterator for a loop
-function vp_util.optmatch(str,patterns)
+function vc_util.optmatch(str,patterns)
   local cutstr = str
   return function()
     if not cutstr then return end
-    local spos, epos = vp_util.find_min_match(cutstr,patterns)
+    local spos, epos = vc_util.find_min_match(cutstr,patterns)
     local match
     local found = (spos == 1)
     if found then
@@ -90,10 +90,10 @@ end
 ---
 --A function generating a table from an iterator.
 --
---@function [parent=#vp_util] gen_table
+--@function [parent=#vc_util] gen_table
 --@param #function it the iterator to use in a for loop
 --@return #table the table containing the returns of the iterator
-function vp_util.gen_table(it)
+function vc_util.gen_table(it)
   local tab = {}
   for el in it do
     table.insert(tab,el)
@@ -108,11 +108,11 @@ end
 --
 --It iterates over both tables checking if the other contains the same elements.
 --
---@function [parent=#vp_util] dftc
+--@function [parent=#vc_util] dftc
 --@param #table t1 the table to compare with t2
 --@param #table t2 the table to compare with t1
 --@return #boolean whether the tables contents are the same
-function vp_util.dftc(t1,t2)
+function vc_util.dftc(t1,t2)
   for i,el in pairs(t1) do
     if t2[i] ~= el then
       return false
@@ -130,13 +130,13 @@ end
 --concatenate strings
 --if one string is nil the other is returned
 --
---@function [parent=#vp_util] concat_optnil
+--@function [parent=#vc_util] concat_optnil
 --@param #string fstr the first string to be concatenated
 --@param #string lstr the second string to be concatenated
 --@param #string sep the seperator to be added between the strings if both are present
 --@param #string retstr The string returned if both strings are empty.
 --  Can be true to return an empty string.
-function vp_util.concat_optnil(fstr,lstr,sep,retstr)
+function vc_util.concat_optnil(fstr,lstr,sep,retstr)
   if fstr then
     if lstr then
       if sep then
@@ -167,20 +167,20 @@ function vp_util.concat_optnil(fstr,lstr,sep,retstr)
 end
 
 ---
---The unit tests for the vp utilities.
+--The unit tests for the vc utilities.
 local function tests()
-  assert(vp_util.dftc({},{}))
-  assert(vp_util.dftc({1},{1}))
-  assert(not vp_util.dftc({1},{2}))
-  assert(vp_util.dftc({1,"2",true},{1,"2",true}))
-  assert(not vp_util.dftc({true,"1",1},{1,1,1}))
+  assert(vc_util.dftc({},{}))
+  assert(vc_util.dftc({1},{1}))
+  assert(not vc_util.dftc({1},{2}))
+  assert(vc_util.dftc({1,"2",true},{1,"2",true}))
+  assert(not vc_util.dftc({true,"1",1},{1,1,1}))
 
-  assert(vp_util.dftc(vp_util.gen_table(vp_util.optmatch("123","123")),{"123"}))
-  assert(vp_util.dftc(vp_util.gen_table(vp_util.optmatch("123","321")),{"123"}))
-  assert(vp_util.dftc(vp_util.gen_table(vp_util.optmatch("123", "1")), {"1","23"}))
-  assert(vp_util.dftc(vp_util.gen_table(vp_util.optmatch("123", "2")), {"1","2","3"}))
+  assert(vc_util.dftc(vc_util.gen_table(vc_util.optmatch("123","123")),{"123"}))
+  assert(vc_util.dftc(vc_util.gen_table(vc_util.optmatch("123","321")),{"123"}))
+  assert(vc_util.dftc(vc_util.gen_table(vc_util.optmatch("123", "1")), {"1","23"}))
+  assert(vc_util.dftc(vc_util.gen_table(vc_util.optmatch("123", "2")), {"1","2","3"}))
 end
 
 tests()
 
-return vp_util
+return vc_util

@@ -1,6 +1,6 @@
 print("running venus test script")
 
-local vp_util = dofile("vp_util.lua")
+local vp_util = dofile("vc_util.lua")
 
 local function for_range_test()
 	local a = 0

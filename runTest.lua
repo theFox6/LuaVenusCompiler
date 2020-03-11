@@ -1,3 +1,3 @@
-local vp = dofile("init.lua")("")
+local vc = dofile("init.lua")("")
 
-vp.dovenus("test.venus")
+vc.dovenus("test.venus")

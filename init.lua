@@ -1,16 +1,16 @@
-if VenusParser then
-  print("VenusParser warning: already initialized")
+if rawget(_G,"LuaVenusCompiler") then
+  print("LuaVenusCompiler warning: already initialized")
 else
-  VenusParser = {}
+  LuaVenusCompiler = {}
 end
 
-function VenusParser.loadFromPath(path)
-  VenusParser.path = path
-  local ret = dofile(path.."VenusParser.lua")
+function LuaVenusCompiler.loadFromPath(path)
+  LuaVenusCompiler.path = path
+  local ret = dofile(path.."LuaVenusCompiler.lua")
   for i,v in pairs(ret) do
-    VenusParser[i] = v
+    LuaVenusCompiler[i] = v
   end
   return ret
 end
 
-return VenusParser.loadFromPath
+return LuaVenusCompiler.loadFromPath

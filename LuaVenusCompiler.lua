@@ -1,7 +1,7 @@
-local local_path = VenusParser.path or ""
-local vp_util = dofile(local_path.."vp_util.lua")
+local local_path = LuaVenusCompiler.path or ""
+local vp_util = dofile(local_path.."vc_util.lua")
 
-local parser = {}
+local compiler = {}
 
 local elements = {
   names = "^(%a%w*)$",
@@ -14,8 +14,8 @@ local elements = {
 
 local non_space_elements = {elements.special_combined,elements.special,elements.strings}
 
-function parser.warn(msg)
-  print("VenusParser warning: " .. msg)
+function compiler.warn(msg)
+  print("LuaVenusCompiler warning: " .. msg)
 end
 
 --TODO: check if spaces before a curly brace were already added
@@ -61,7 +61,7 @@ local function parse_element(el,pc)
 
   if el == "=>" then
     if not pc.lambargs then
-      parser.warn(("invalid lambda in line %i"):format(pc.line))
+      compiler.warn(("invalid lambda in line %i"):format(pc.line))
       return el
     end
     local larg = pc.lambargs
@@ -72,7 +72,7 @@ local function parse_element(el,pc)
     return "function" .. larg .. " "
   elseif pc.lambend then
     if prefix then
-      parser.warn(("end statement and lambda match end may be mixed in line %i"):format(pc.line))
+      compiler.warn(("end statement and lambda match end may be mixed in line %i"):format(pc.line))
       prefix = pc.lambargs .. prefix
     else
       prefix = pc.lambargs
@@ -154,7 +154,7 @@ local function parse_element(el,pc)
       pc.ifend = "end"
       return "",prefix
     else
-      parser.warn(("closing curly bracket in line %i could not be matched to an opening one"):format(pc.line))
+      compiler.warn(("closing curly bracket in line %i could not be matched to an opening one"):format(pc.line))
       return el,prefix
     end
   elseif el == "foreach" then
@@ -220,7 +220,7 @@ local function parse_element(el,pc)
       pc.optassign = false
       return " = " .. nam .. " + 1"
     else
-      parser.warn(("empty increment in line %i"):format(pc.line))
+      compiler.warn(("empty increment in line %i"):format(pc.line))
       return el, prefix
     end
   elseif el == "+=" then
@@ -229,7 +229,7 @@ local function parse_element(el,pc)
       pc.optassign = false
       return "= " .. nam .. "+"
     else
-      parser.warn(("empty increment assignment in line %i"):format(pc.line))
+      compiler.warn(("empty increment assignment in line %i"):format(pc.line))
     end
   elseif el == "-=" then
     if pc.optassign then
@@ -237,7 +237,7 @@ local function parse_element(el,pc)
       pc.optassign = false
       return "= " .. nam .. "-"
     else
-      parser.warn(("empty decrement assignment in line %i"):format(pc.line))
+      compiler.warn(("empty decrement assignment in line %i"):format(pc.line))
     end
   elseif el == "*=" then
     if pc.optassign then
@@ -245,7 +245,7 @@ local function parse_element(el,pc)
       pc.optassign = false
       return "= " .. nam .. "*"
     else
-      parser.warn(("empty multiply assignment in line %i"):format(pc.line))
+      compiler.warn(("empty multiply assignment in line %i"):format(pc.line))
     end
   elseif el == "/=" then
     if pc.optassign then
@@ -253,7 +253,7 @@ local function parse_element(el,pc)
       pc.optassign = false
       return "= " .. nam .. "/"
     else
-      parser.warn(("empty divide assignment in line %i"):format(pc.line))
+      compiler.warn(("empty divide assignment in line %i"):format(pc.line))
     end
   elseif el == "^=" then
     if pc.optassign then
@@ -261,7 +261,7 @@ local function parse_element(el,pc)
       pc.optassign = false
       return "= " .. nam .. "^"
     else
-      parser.warn(("empty power assignment in line %i"):format(pc.line))
+      compiler.warn(("empty power assignment in line %i"):format(pc.line))
     end
   elseif el == ".=" then
     if pc.optassign then
@@ -269,7 +269,7 @@ local function parse_element(el,pc)
       pc.optassign = false
       return "= " .. nam .. ".."
     else
-      parser.warn(("empty concatenation assignment in line %i"):format(pc.line))
+      compiler.warn(("empty concatenation assignment in line %i"):format(pc.line))
     end
   end
   --print(el,pc.instring and "in string" or "")
@@ -441,7 +441,7 @@ local function handle_lineend_lambargs(pc)
   return ""
 end
 
-function parser.tl_venus_string(str)
+function compiler.tl_venus_string(str)
   local fc = ""
   local pc = {instring = false, opencurly = {}, line = 0}
   for l,e in vp_util.optmatch(str,"\n") do
@@ -460,20 +460,20 @@ function parser.tl_venus_string(str)
     end
   end
   if (#pc.opencurly > 0) then
-    parser.warn("not all curly brackets were closed")
+    compiler.warn("not all curly brackets were closed")
   end
   return fc
 end
 
-function parser.tl_venus_file(file)
+function compiler.tl_venus_file(file)
   local f = io.open(file)
-  local ret = parser.tl_venus_string(f:read("*a"))
+  local ret = compiler.tl_venus_string(f:read("*a"))
   f:close()
   return ret
 end
 
-function parser.loadvenus(file,env)
-  local fc = parser.tl_venus_file(file)
+function compiler.loadvenus(file,env)
+  local fc = compiler.tl_venus_file(file)
   if env then
     return loadstring(fc,"@"..file,"t",env)
   else
@@ -481,19 +481,19 @@ function parser.loadvenus(file,env)
   end
 end
 
-function parser.dovenus(file)
-  local ff, err = parser.loadvenus(file)
+function compiler.dovenus(file)
+  local ff, err = compiler.loadvenus(file)
   if ff == nil then
     error(err,2)
   end
   return ff()
 end
 
-function parser.convert_venus_file(venus_file_in,lua_file_out)
-  local s = parser.tl_venus_file(venus_file_in)
+function compiler.convert_venus_file(venus_file_in,lua_file_out)
+  local s = compiler.tl_venus_file(venus_file_in)
   local f = io.open(lua_file_out,"w")
   f:write(s)
   f:close()
 end
 
-return parser
+return compiler

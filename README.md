@@ -1,7 +1,7 @@
-# venus lua parser
+# LuaVenusCompiler
 [![luacheck][luacheck badge]][luacheck workflow]  
-A parser that loads venus files into lua. Written in lua.  
-The parser reads a venus file and replaces venus syntax by lua syntax.  
+A compiler that translates venus files into lua. Written in lua.  
+The compiler reads a venus file and replaces venus syntax by lua syntax.  
 It can also load and run the result.
 
 ## features
@@ -132,15 +132,15 @@ Assignment operators `+=`, `-=`, `*=`, `/=`, `^=` and `.=` can be used.
 local a = 0
 -- increment
 a += 2
--- decrement
+// decrement
 a -= 1
--- multiply
+## multiply
 a *= 8
--- divide
+// divide
 a /= 2
 -- to the power of
 a ^= 3
--- concatenate string
+// concatenate string
 a .= " str"
 ```
 will generate
@@ -160,21 +160,21 @@ a = a ^ 3
 a = a .. " str"
 ```
 
-## working with the parser
+## working with the compiler
 ### loading
-The init.lua returns a function for loading the parser.  
+The init.lua returns a function for loading the compiler.  
 You have to call it with the path to the script itself as argument.  
-In case you have the VenusParser directory within your project's  
+In case you have the LuaVenusCompiler directory within your project's  
 ways of loding it may be:
 ```lua
 --in case your project is run within it's own folder
-local vc = dofile("VenusParser/init.lua")("VenusParser/")
+local vc = dofile("LuaVenusCompiler/init.lua")("LuaVenusCompiler/")
 --in case you have a variable called project_loc containing the path to your projects folder
-local vc = dofile(project_loc.."/VenusParser/init.lua")(project_loc.."/VenusParser/")
+local vc = dofile(project_loc.."/LuaVenusCompiler/init.lua")(project_loc.."/LuaVenusCompiler/")
 --using require
-local vc = require("VenusParser")("VenusParser/")
+local vc = require("LuaVenusCompiler")("LuaVenusCompiler/")
 ```
-When it is loaded it can also be accessed with the global called "VenusParser".
+When it is loaded it can also be accessed with the global called "LuaVenusCompiler".
 
 ### running venus files
 `vc.dovenus(file)` works like `dofile(file)`  
@@ -186,17 +186,17 @@ It's argument can be a relative or absolute path to the file that should be load
 It returns a function that runs the generated lua.
 
 ### generating lua code
-`vp.tl_venus_file(file)` returns the lua generated from the files contents  
+`vc.tl_venus_file(file)` returns the lua generated from the files contents  
 It's argument can be a relative or absolute path to the file that should be translated.  
 It returns the generated lua as string.
 
-`vp.tl_venus_string(str)` returns the lua generated from the given string  
+`vc.tl_venus_string(str)` returns the lua generated from the given string  
 It returns the generated lua as string.
 
 ### generating lua files
-`vp.convert_venus_file(venus_file_in,lua_file_out)` generates a lua file  
+`vc.convert_venus_file(venus_file_in,lua_file_out)` generates a lua file  
 It's arguments can be relative or absolute paths.  
 The venus_file_in will be converted to lua and written to lua_file_out.
 
-[luacheck badge]: https://github.com/theFox6/VenusParser/workflows/luacheck/badge.svg
-[luacheck workflow]: https://github.com/theFox6/VenusParser/actions?query=workflow%3Aluacheck
+[luacheck badge]: https://github.com/theFox6/LuaVenusCompiler/workflows/luacheck/badge.svg
+[luacheck workflow]: https://github.com/theFox6/LuaVenusCompiler/actions?query=workflow%3Aluacheck
