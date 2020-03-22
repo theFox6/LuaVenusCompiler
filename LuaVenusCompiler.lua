@@ -1,5 +1,5 @@
 local local_path = LuaVenusCompiler.path or ""
-local vp_util = dofile(local_path.."vc_util.lua")
+local vc_util = dofile(local_path.."vc_util.lua")
 
 local compiler = {}
 
@@ -324,7 +324,7 @@ local function handle_prefix(el,p)
       print("prel:" .. el)
     end
     --]]
-    return vp_util.concat_optnil(pre,el," "),lpre
+    return vc_util.concat_optnil(pre,el," "),lpre
   end
   return el
 end
@@ -354,7 +354,9 @@ end
 
 local function store_optassign(el,pc)
   if pc.optassign and el ~= "" then
-    if pc.linestart and el:match(elements.names) then
+    if (pc.linestart and el:match(elements.names)) or
+        (pc.optassign and el == ".") or
+        (pc.optassign and pc.optassign ~= true and pc.optassign:sub(#pc.optassign) == "." and el:match(elements.names)) then
       if pc.optassign == true then
         pc.optassign = el
       else
@@ -368,13 +370,13 @@ end
 
 local function parse_line(l,pc)
   local pl = ""
-  for sp,s in vp_util.optmatch(l,elements.spaces) do
+  for sp,s in vc_util.optmatch(l,elements.spaces) do
     if s then
       if store_space(sp,pc) then
         pl = pl .. sp
       end
     else
-      for st in vp_util.optmatch(sp,non_space_elements) do
+      for st in vc_util.optmatch(sp,non_space_elements) do
         if pc.slcomm then
           pl = pl .. st
         else
@@ -444,7 +446,7 @@ end
 function compiler.tl_venus_string(str)
   local fc = ""
   local pc = {instring = false, opencurly = {}, line = 0}
-  for l,e in vp_util.optmatch(str,"\n") do
+  for l,e in vc_util.optmatch(str,"\n") do
     if e then
       if pc.slcomm then
         pc.slcomm = false

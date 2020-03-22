@@ -205,4 +205,8 @@ assert(vp_util.dftc(concatsub(tt) ,{"hello there", "venus test"}))
 
 assert(not (function()   if(true)  then return end return true end)() )
 
+local ctt = {test = "hello"}
+ctt.test = ctt.test .. " world"
+assert(ctt.test == "hello world")
+
 print("venus test end")
