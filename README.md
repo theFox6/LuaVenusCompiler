@@ -25,7 +25,7 @@ end
 ```
 
 ### comments
-for comments `--`, `//` and `##` can be used
+for comments `--` and `##` can be used
 if something follows a `--` it will always be treated as comment
 
 ### curly braces
@@ -132,15 +132,15 @@ Assignment operators `+=`, `-=`, `*=`, `/=`, `^=` and `.=` can be used.
 local a = 0
 -- increment
 a += 2
-// decrement
+## decrement
 a -= 1
 ## multiply
 a *= 8
-// divide
+-- divide
 a /= 2
 -- to the power of
 a ^= 3
-// concatenate string
+## concatenate string
 a .= " str"
 ```
 will generate

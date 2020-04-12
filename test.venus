@@ -41,10 +41,10 @@ end
 
 for_in_test()
 
-// comments
+-- comments
 ## yay a comment
-//comment
-assert("//"=="/".."/")
+##comment
+assert("##"=="#".."#")
 -- another comment
 assert([[
 ##]]=="#".."#","comment within [[string]] falsely detected")

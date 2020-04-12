@@ -201,7 +201,7 @@ local function parse_element(el,pc)
     if pc.lambargs then
       pc.lambend = true
     end
-  elseif el == "//" or el=="##" then
+  elseif el=="##" then
     if not pc.instring then
       pc.slcomm = true
       return "--",prefix
