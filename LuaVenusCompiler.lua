@@ -356,7 +356,8 @@ local function store_optassign(el,pc)
   if pc.optassign and el ~= "" then
     if (pc.linestart and el:match(elements.names)) or
         (pc.optassign and el == ".") or
-        (pc.optassign and pc.optassign ~= true and pc.optassign:sub(#pc.optassign) == "." and el:match(elements.names)) then
+        (pc.optassign and pc.optassign ~= true and
+		pc.optassign:sub(#pc.optassign) == "." and el:match(elements.names)) then
       if pc.optassign == true then
         pc.optassign = el
       else
