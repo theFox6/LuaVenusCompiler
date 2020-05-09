@@ -1,13 +1,12 @@
 # LuaVenusCompiler
 [![luacheck][luacheck badge]][luacheck workflow]  
-A compiler that translates venus files into lua. Written in lua.  
-The compiler reads a venus file and replaces venus syntax by lua syntax.  
+A compiler that translates Venus files into Lua. Written in Lua.  
+The compiler reads a Venus file and replaces Venus syntax by Lua syntax.  
 It can also load and run the result.
 
-## features
-### foreach
+## Features:
+### "foreach" loop
 The `foreach` statement will geneate a `pairs` statement.
-
 ```lua
 local table = {2,1,3,"test"}
 
@@ -15,7 +14,7 @@ foreach el in table {
   print(el)
 }
 ```
-will generate
+will generate:
 ```lua
 local table = {2,1,3,"test"}
 
@@ -24,19 +23,34 @@ for _, el in table do
 end
 ```
 
-### comments
-for comments `--` and `##` can be used
-if something follows a `--` it will always be treated as comment
+### Comments
+For comments `--` and `##` can be used
+If something follows a `--` it will always be treated as comment
 
-### curly braces
-The `do`,`then` and `end` statements can be replaced by curly brace syntax.  
-They can be used in functions, loops, conditions.  
+
+### Functions
+`fn` can be used instead of `function`.
+```lua
+fn test() {
+	print("hi")
+}
+```
+will generate
+```lua
+function test()
+	print("hi")
+end
+```
+
+### Curly braces based syntax
+The `do`,`then` and `end` statements can be replaced by curly braces syntax.  
+They can be used in functions, loops, conditions, etcetera.  
 For example:
 ```lua
 do {
 	local table = {2,1,3,"test","test2",3}
 
-	function findTest(t) {
+	fn findTest(t) {
 		repeat {
 			local found = false
 			local el = table.remove(t)
@@ -49,7 +63,7 @@ do {
 	}
 }
 ```
-will generate
+will generate:
 ```lua
 do
 	local table = {2,1,3,"test","test2",3}
@@ -68,22 +82,8 @@ do
 end
 ```
 
-### functions
-`fn` can be used instead of `function`.
-```lua
-fn test() {
-	print("hi")
-}
-```
-will generate
-```lua
-function test()
-	print("hi")
-end
-```
-
-### lambdas
-Lambda syntax `(args) => {...}` can be used to create functions.
+### Lambdas / Anonymous functions
+Lambda syntax `(args) => {...}` can be used to create anonymous functions.
 ```lua
 local result
 fn store_it(f) {
@@ -94,7 +94,7 @@ store_it((a,b) => {
 	return (a - b) * 2
 })
 ```
-will generate
+will generate:
 ```lua
 local result
 function store_it(f)
@@ -106,8 +106,8 @@ store_it(function(a,b)
 end)
 ```
 
-### incrrement and decrement
-`++` and `--` can be used to in/decrement by 1
+### Increment and Decrement
+`++` and `--` can be used to add/sub by 1
 ```lua
 local i = 0
 local j = 0
@@ -115,7 +115,7 @@ local j = 0
 i++
 j--
 ```
-will generate
+will generate:
 ```lua
 local i = 0
 local j = 0
@@ -123,45 +123,43 @@ local j = 0
 i = i + 1
 j = j - 1
 ```
-`--` can also be a comment!  
-If there is anything behind a `--` the `--` treated as comment.
 
 ### assignments
-Assignment operators `+=`, `-=`, `*=`, `/=`, `^=` and `.=` can be used.
+Assignment operators `+=`, `-=`, `*=`, `/=`, `^=` and `.=` can be used for math on variables.
 ```lua
 local a = 0
--- increment
+-- Increased by
 a += 2
-## decrement
+## Decreased by
 a -= 1
-## multiply
+## Multiplied by
 a *= 8
--- divide
+-- Divided by
 a /= 2
--- to the power of
+-- Powered by
 a ^= 3
-## concatenate string
+## Concatenate string
 a .= " str"
 ```
 will generate
 ```lua
 local a = 0
--- increment
+-- Increased by
 a = a + 2
--- decrement
+-- Decreased by
 a = a - 1
--- multiply
+-- Multiplied by
 a = a * 8
--- divide
+-- Divided by
 a = a / 2
--- to the power of
+-- Powered by
 a = a ^ 3
--- concatenate string
+-- Concatenate string
 a = a .. " str"
 ```
 
-## working with the compiler
-### loading
+## Working with the compiler
+### Loading 
 The init.lua returns a function for loading the compiler.  
 You have to call it with the path to the script itself as argument.  
 In case you have the LuaVenusCompiler directory within your project's  
@@ -176,16 +174,16 @@ local vc = require("LuaVenusCompiler")("LuaVenusCompiler/")
 ```
 When it is loaded it can also be accessed with the global called "LuaVenusCompiler".
 
-### running venus files
+### Running Venus files
 `vc.dovenus(file)` works like `dofile(file)`  
 It's argument can be a relative or absolute path to the file that should be run.
 
-### loading venus files
+### Loading Venus files
 `vc.loadvenus(file)` works like `loadfile(file)`  
 It's argument can be a relative or absolute path to the file that should be loaded.  
 It returns a function that runs the generated lua.
 
-### generating lua code
+### Generating Lua code
 `vc.tl_venus_file(file)` returns the lua generated from the files contents  
 It's argument can be a relative or absolute path to the file that should be translated.  
 It returns the generated lua as string.
@@ -193,7 +191,7 @@ It returns the generated lua as string.
 `vc.tl_venus_string(str)` returns the lua generated from the given string  
 It returns the generated lua as string.
 
-### generating lua files
+### Generating Lua files
 `vc.convert_venus_file(venus_file_in,lua_file_out)` generates a lua file  
 It's arguments can be relative or absolute paths.  
 The venus_file_in will be converted to lua and written to lua_file_out.
